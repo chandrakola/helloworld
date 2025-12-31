@@ -2,28 +2,28 @@ version: '3.8'
 
 services:
   django:
-    image: helloworld-django:latest
+    image: helloworld-django:${DJANGO_VERSION:-latest}
     container_name: helloworld-django
     ports:
       - "8001:8001"
     restart: always
 
   springboot:
-    image: helloworld-springboot:latest
+    image: helloworld-springboot:${SPRINGBOOT_VERSION:-latest}
     container_name: helloworld-springboot
     ports:
       - "8002:8002"
     restart: always
 
   rails:
-    image: helloworld-rails:latest
+    image: helloworld-rails:${RAILS_VERSION:-latest}
     container_name: helloworld-rails
     ports:
       - "8003:8003"
     restart: always
 
   node:
-    image: helloworld-node:latest
+    image: helloworld-node:${NODE_VERSION:-latest}
     container_name: helloworld-node
     ports:
       - "8004:8004"
