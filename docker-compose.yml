@@ -2,6 +2,9 @@ version: '3.8'
 
 services:
   django:
+    build:
+      context: ./apps/django
+      dockerfile: Dockerfile
     image: helloworld-django:${DJANGO_VERSION:-latest}
     container_name: helloworld-django
     ports:
@@ -9,6 +12,9 @@ services:
     restart: always
 
   springboot:
+    build:
+      context: ./apps/springboot
+      dockerfile: Dockerfile
     image: helloworld-springboot:${SPRINGBOOT_VERSION:-latest}
     container_name: helloworld-springboot
     ports:
@@ -16,6 +22,9 @@ services:
     restart: always
 
   rails:
+    build:
+      context: ./apps/rails
+      dockerfile: Dockerfile
     image: helloworld-rails:${RAILS_VERSION:-latest}
     container_name: helloworld-rails
     ports:
@@ -23,6 +32,9 @@ services:
     restart: always
 
   node:
+    build:
+      context: ./apps/node
+      dockerfile: Dockerfile
     image: helloworld-node:${NODE_VERSION:-latest}
     container_name: helloworld-node
     ports:
