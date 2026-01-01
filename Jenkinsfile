@@ -6,7 +6,7 @@ pipeline {
             parallel {
                 stage('Django') {
                     when {
-                        changeset "apps/django/**"
+                        expression { return env.BUILD_NUMBER == '1' || anyChangesIn('apps/django') }
                     }
                     steps {
                         script {
@@ -16,7 +16,7 @@ pipeline {
                 }
                 stage('SpringBoot') {
                     when {
-                        changeset "apps/springboot/**"
+                        expression { return env.BUILD_NUMBER == '1' || anyChangesIn('apps/springboot') }
                     }
                     steps {
                         script {
@@ -26,7 +26,7 @@ pipeline {
                 }
                 stage('Rails') {
                     when {
-                        changeset "apps/rails/**"
+                        expression { return env.BUILD_NUMBER == '1' || anyChangesIn('apps/rails') }
                     }
                     steps {
                         script {
@@ -36,7 +36,7 @@ pipeline {
                 }
                 stage('Node') {
                     when {
-                        changeset "apps/node/**"
+                        expression { return env.BUILD_NUMBER == '1' || anyChangesIn('apps/node') }
                     }
                     steps {
                         script {
@@ -46,6 +46,18 @@ pipeline {
                 }
             }
         }
+    }
+}
+
+// Helper to detect changes in a specific directory
+def anyChangesIn(String path) {
+    // On first build, this doesn't matter as expression handles it
+    // On subsequent builds, check the diff between this commit and the previous one
+    try {
+        def changed = sh(returnStatus: true, script: "git diff --name-only HEAD~1 HEAD | grep '^${path}/'") == 0
+        return changed
+    } catch (Exception e) {
+        return true // Fallback to building if git check fails
     }
 }
 
