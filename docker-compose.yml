@@ -28,3 +28,15 @@ services:
     ports:
       - "8004:8004"
     restart: always
+
+  github-runner:
+    image: myoung34/github-runner:latest
+    container_name: github-runner
+    restart: always
+    environment:
+      REPO_URL: ${REPO_URL}
+      ACCESS_TOKEN: ${GITHUB_PAT}
+      RUNNER_NAME: helloworld-runner
+      RUNNER_LABELS: self-hosted,linux,x64
+    volumes:
+      - /var/run/docker.sock:/var/run/docker.sock
