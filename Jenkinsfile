@@ -5,6 +5,9 @@ pipeline {
         stage('Build & Test Services') {
             parallel {
                 stage('Django') {
+                    when {
+                        changeset "apps/django/**"
+                    }
                     steps {
                         script {
                             buildService('django')
@@ -12,6 +15,9 @@ pipeline {
                     }
                 }
                 stage('SpringBoot') {
+                    when {
+                        changeset "apps/springboot/**"
+                    }
                     steps {
                         script {
                             buildService('springboot')
@@ -19,6 +25,9 @@ pipeline {
                     }
                 }
                 stage('Rails') {
+                    when {
+                        changeset "apps/rails/**"
+                    }
                     steps {
                         script {
                             buildService('rails')
@@ -26,6 +35,9 @@ pipeline {
                     }
                 }
                 stage('Node') {
+                    when {
+                        changeset "apps/node/**"
+                    }
                     steps {
                         script {
                             buildService('node')
