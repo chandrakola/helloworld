@@ -1,12 +1,16 @@
 pipeline {
     agent any
 
+    parameters {
+        booleanParam(name: 'FORCE_BUILD_ALL', defaultValue: false, description: 'Check this to build all services regardless of recent changes')
+    }
+
     stages {
         stage('Build & Test Services') {
             parallel {
                 stage('Django') {
                     when {
-                        expression { return env.BUILD_NUMBER == '1' || anyChangesIn('apps/django') }
+                        expression { return shouldBuild('django') }
                     }
                     steps {
                         script {
@@ -16,7 +20,7 @@ pipeline {
                 }
                 stage('SpringBoot') {
                     when {
-                        expression { return env.BUILD_NUMBER == '1' || anyChangesIn('apps/springboot') }
+                        expression { return shouldBuild('springboot') }
                     }
                     steps {
                         script {
@@ -26,7 +30,7 @@ pipeline {
                 }
                 stage('Rails') {
                     when {
-                        expression { return env.BUILD_NUMBER == '1' || anyChangesIn('apps/rails') }
+                        expression { return shouldBuild('rails') }
                     }
                     steps {
                         script {
@@ -36,7 +40,7 @@ pipeline {
                 }
                 stage('Node') {
                     when {
-                        expression { return env.BUILD_NUMBER == '1' || anyChangesIn('apps/node') }
+                        expression { return shouldBuild('node') }
                     }
                     steps {
                         script {
@@ -49,12 +53,19 @@ pipeline {
     }
 }
 
-// Helper to detect changes in a specific directory
-def anyChangesIn(String path) {
-    // On first build, this doesn't matter as expression handles it
-    // On subsequent builds, check the diff between this commit and the previous one
+// Logic to determine if a service should be built
+def shouldBuild(String serviceName) {
+    // 1. Build if it's the very first run
+    // 2. Build if user manually checked the FORCE_BUILD_ALL box
+    if (env.BUILD_NUMBER == '1' || params.FORCE_BUILD_ALL) {
+        return true
+    }
+    
+    // 3. Build if the app folder OR any root config files changed in the last commit
     try {
-        def changed = sh(returnStatus: true, script: "git diff --name-only HEAD~1 HEAD | grep '^${path}/'") == 0
+        def rootConfigs = "Jenkinsfile|docker-compose\\.yml|\\.env|\\.gitignore"
+        def script = "git diff --name-only HEAD~1 HEAD | grep -E '^apps/${serviceName}/|${rootConfigs}'"
+        def changed = sh(returnStatus: true, script: script) == 0
         return changed
     } catch (Exception e) {
         return true // Fallback to building if git check fails
