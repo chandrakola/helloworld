@@ -1,6 +1,11 @@
 pipeline {
     agent any
 
+    triggers {
+        // Automatically check GitHub for changes every minute
+        pollSCM('* * * * *')
+    }
+
     parameters {
         booleanParam(name: 'FORCE_BUILD_ALL', defaultValue: false, description: 'Check this to build all services regardless of recent changes')
     }
