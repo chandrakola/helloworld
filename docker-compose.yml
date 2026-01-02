@@ -10,6 +10,11 @@ services:
     ports:
       - "8001:8001"
     restart: always
+    logging:
+      driver: "json-file"
+      options:
+        max-size: "100m"
+        max-file: "3"
 
   springboot:
     build:
@@ -20,6 +25,11 @@ services:
     ports:
       - "8002:8002"
     restart: always
+    logging:
+      driver: "json-file"
+      options:
+        max-size: "100m"
+        max-file: "3"
 
   rails:
     build:
@@ -30,6 +40,11 @@ services:
     ports:
       - "8003:8003"
     restart: always
+    logging:
+      driver: "json-file"
+      options:
+        max-size: "100m"
+        max-file: "3"
 
   node:
     build:
@@ -40,3 +55,8 @@ services:
     ports:
       - "8004:8004"
     restart: always
+    logging:
+      driver: "json-file"
+      options:
+        max-size: "100m"
+        max-file: "3"
