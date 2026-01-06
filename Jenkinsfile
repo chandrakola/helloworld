@@ -93,11 +93,33 @@ def buildService(String serviceName) {
         
         echo "Building ${serviceName} version ${version}..."
         
-        // Build stage now includes tests (inside Dockerfile)
+        // Build the image
         sh "docker build -t helloworld-${serviceName}:${version} ."
         sh "docker tag helloworld-${serviceName}:${version} helloworld-${serviceName}:${codename}"
         sh "docker tag helloworld-${serviceName}:${version} helloworld-${serviceName}:latest"
+
+        // === SBOM Generation & Upload ===
+        echo "🛡️ Generating SBOM for ${serviceName}..."
+        sh "syft helloworld-${serviceName}:${version} -o cyclonedx-xml > bom.xml"
+
+        echo "📡 Uploading SBOM to Dependency-Track..."
+        // DTrack uses Project Name: 'helloworld-node', 'helloworld-django', etc.
+        def dtrackKey = 'Iodt_8n4f5JMm_9Q6C4JjhVUO7HakfarmILTznEC6p94Yd' // TODO: Move to Credentials
+        def dtrackUrl = 'http://shared-dtrack-apiserver:8080'
         
-        echo "✅ Built ${serviceName} version: ${version}"
+        sh """
+            curl -X POST "${dtrackUrl}/api/v1/bom" \
+            -H "Content-Type: multipart/form-data" \
+            -H "X-Api-Key: ${dtrackKey}" \
+            -F "autoCreate=true" \
+            -F "projectName=helloworld-${serviceName}" \
+            -F "projectVersion=${version}" \
+            -F "bom=@bom.xml"
+        """
+        
+        // Cleanup BOM
+        sh "rm bom.xml"
+        
+        echo "✅ Built and Secured ${serviceName} version: ${version}"
     }
 }
