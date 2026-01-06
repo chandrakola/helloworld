@@ -21,6 +21,6 @@ class HelloworldApplicationTests {
     void shouldReturnDefaultMessage() throws Exception {
         this.mockMvc.perform(get("/"))
                 .andExpect(status().isOk())
-                .andExpect(content().string("Hello World from Spring Boot!"));
+                .andExpect(content().string("Hello World from Spring Boot!!!"));
     }
 }

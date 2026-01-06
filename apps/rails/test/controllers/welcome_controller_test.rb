@@ -12,6 +12,6 @@ class WelcomeControllerTest < Test::Unit::TestCase
   def test_homepage
     get '/'
     assert last_response.ok?
-    assert last_response.body.include?('Hello World from Ruby on Rails!')
+    assert last_response.body.include?('Hello World from Ruby on Rails!!!')
   end
 end
