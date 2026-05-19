@@ -10,6 +10,8 @@ services:
     ports:
       - "8001:8001"
     restart: always
+    networks:
+      - home-lab
     logging:
       driver: "json-file"
       options:
@@ -25,6 +27,8 @@ services:
     ports:
       - "8002:8002"
     restart: always
+    networks:
+      - home-lab
     logging:
       driver: "json-file"
       options:
@@ -40,6 +44,8 @@ services:
     ports:
       - "8003:8003"
     restart: always
+    networks:
+      - home-lab
     logging:
       driver: "json-file"
       options:
@@ -55,8 +61,15 @@ services:
     ports:
       - "8004:8004"
     restart: always
+    networks:
+      - home-lab
     logging:
       driver: "json-file"
       options:
         max-size: "100m"
         max-file: "3"
+
+networks:
+  home-lab:
+    external: true
+    name: home-lab
