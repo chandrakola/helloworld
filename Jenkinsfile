@@ -117,7 +117,7 @@ def buildService(String serviceName) {
         def dtrackUrl = env.DTRACK_URL ?: 'http://shared-dtrack-apiserver:8080'
         withCredentials([string(credentialsId: 'dtrack-api-key', variable: 'DTRACK_API_KEY')]) {
             sh """
-                curl -X POST "${dtrackUrl}/api/v1/bom" \
+                curl --fail-with-body --silent --show-error -X POST "${dtrackUrl}/api/v1/bom" \
                 -H "Content-Type: multipart/form-data" \
                 -H "X-Api-Key: \${DTRACK_API_KEY}" \
                 -F "autoCreate=true" \
