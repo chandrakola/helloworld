@@ -1,10 +1,16 @@
-FROM node:20-bullseye-slim
+FROM eclipse-temurin:21-jre AS java-source
+
+FROM node:20-bookworm-slim
 
 WORKDIR /app
 
-# Install JRE (required for Jenkins agent), Git, and Curl
+# Copy Java JRE from Temurin
+COPY --from=java-source /opt/java/openjdk /opt/java/openjdk
+ENV JAVA_HOME=/opt/java/openjdk
+ENV PATH="$JAVA_HOME/bin:$PATH"
+
+# Install Git, and Curl
 RUN apt-get update && apt-get install -y \
-    openjdk-17-jre-headless \
     git \
     curl \
     && rm -rf /var/lib/apt/lists/*

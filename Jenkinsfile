@@ -1,6 +1,12 @@
 pipeline {
     agent none
 
+    options {
+        // Prevent SCM polling from stacking duplicate pipelines while agents
+        // are unavailable or a previous build is still in progress.
+        disableConcurrentBuilds(abortPrevious: true)
+    }
+
     triggers {
         // Automatically check GitHub for changes every minute
         pollSCM('* * * * *')
