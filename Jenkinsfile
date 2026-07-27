@@ -1,5 +1,5 @@
 pipeline {
-    agent any
+    agent none
 
     triggers {
         // Automatically check GitHub for changes every minute
@@ -14,6 +14,7 @@ pipeline {
         stage('Build & Test Services') {
             parallel {
                 stage('Django') {
+                    agent { label 'ci-builder-python' }
                     when {
                         expression { return shouldBuild('django') }
                     }
@@ -24,6 +25,7 @@ pipeline {
                     }
                 }
                 stage('SpringBoot') {
+                    agent { label 'ci-builder-java' }
                     when {
                         expression { return shouldBuild('springboot') }
                     }
@@ -34,6 +36,7 @@ pipeline {
                     }
                 }
                 stage('Rails') {
+                    agent { label 'ci-builder-ruby' }
                     when {
                         expression { return shouldBuild('rails') }
                     }
@@ -44,6 +47,7 @@ pipeline {
                     }
                 }
                 stage('Node') {
+                    agent { label 'ci-builder-nodejs' }
                     when {
                         expression { return shouldBuild('node') }
                     }
@@ -57,6 +61,7 @@ pipeline {
         }
 
         stage('Deploy') {
+            agent { label 'built-in' }
             steps {
                 sh "docker compose up -d"
                 echo "🚀 Services deployed/updated successfully!"
@@ -103,7 +108,7 @@ def buildService(String serviceName) {
         sh "syft helloworld-${serviceName}:${version} -o cyclonedx-xml > bom.xml"
 
         echo "📡 Uploading SBOM to Dependency-Track..."
-        def dtrackUrl = 'http://shared-dtrack-apiserver:8080'
+        def dtrackUrl = env.DTRACK_URL ?: 'http://shared-dtrack-apiserver:8080'
         withCredentials([string(credentialsId: 'dtrack-api-key', variable: 'DTRACK_API_KEY')]) {
             sh """
                 curl -X POST "${dtrackUrl}/api/v1/bom" \
